@@ -33,9 +33,11 @@ class NotificationDialog extends StatelessWidget
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 10.0),
-            Image.asset("images/uberx.png", width: 150.0,),
+            Image.asset("assets/images/taxi.png", width: 150.0,),
             SizedBox(height: 0.0,),
-            Text("New Ride Request", style: TextStyle(fontFamily: "Brand Bold", fontSize: 20.0,),),
+            Text("New Ride Request", style: TextStyle(
+              // fontFamily: "Brand Bold",
+              fontSize: 20.0,),),
             SizedBox(height: 20.0),
             Padding(
               padding: EdgeInsets.all(18.0),
@@ -45,7 +47,7 @@ class NotificationDialog extends StatelessWidget
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset("images/pickicon.png", height: 16.0, width: 16.0,),
+                      Image.asset("assets/images/pickicon.png", height: 16.0, width: 16.0,),
                       SizedBox(width: 20.0,),
                       Expanded(
                         child: Container(child: Text(rideDetails.pickup_address, style: TextStyle(fontSize: 18.0),)),
@@ -57,7 +59,7 @@ class NotificationDialog extends StatelessWidget
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset("images/desticon.png", height: 16.0, width: 16.0,),
+                      Image.asset("assets/images/desticon.png", height: 16.0, width: 16.0,),
                       SizedBox(width: 20.0,),
                       Expanded(
                           child: Container(child: Text(rideDetails.dropoff_address, style: TextStyle(fontSize: 18.0),))

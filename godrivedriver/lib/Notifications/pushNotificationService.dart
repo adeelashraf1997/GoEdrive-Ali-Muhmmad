@@ -45,9 +45,10 @@ class PushNotificationService
 // // you cant return directly no need to save in userRequestId  variable
 // // this will work for android you should add // print('${ message.data}') to see what
 // // inside
+    print('${ message.data}');
     String userRequestId = '';
     if (Platform.isAndroid) {
-      userRequestId = message.data['data']['ride_request_id'].toString();
+      userRequestId = message.data['ride_request_id'].toString();
     } else {
       userRequestId = message.data['ride_request_id'].toString();
     }
