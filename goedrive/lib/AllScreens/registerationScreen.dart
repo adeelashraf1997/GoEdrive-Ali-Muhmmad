@@ -24,11 +24,11 @@ class RegisterationScreen extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                height: 20.0,
+                height: 10.0,
               ),
               Image(
-                image: AssetImage("images/logo.png"),
-                width: 390.0,
+                image: AssetImage("assets/images/logo.png"),
+                width: 300.0,
                 height: 250.0,
                 alignment: Alignment.center,
               ),
@@ -47,85 +47,94 @@ class RegisterationScreen extends StatelessWidget {
                 padding: EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: 1.0,
-                    ),
-                    TextField(
-                      controller: nameTextEditingController,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: "Name",
-                        labelStyle: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10.0,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                    SizedBox(
-                      height: 1.0,
-                    ),
-                    TextField(
-                      controller: emailTextEditingController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        labelStyle: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10.0,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextField(
+                        controller: nameTextEditingController,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Name',
+                          labelStyle: TextStyle(
+                            fontSize: 14.0,
+                          ),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.0,
+                          ),
                         ),
                       ),
-                      style: TextStyle(fontSize: 14.0),
                     ),
-                    SizedBox(
-                      height: 1.0,
-                    ),
-                    TextField(
-                      controller: phoneTextEditingController,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: "Phone",
-                        labelStyle: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10.0,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                    SizedBox(
-                      height: 1.0,
-                    ),
-                    TextField(
-                      controller: passwordTextEditingController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        labelStyle: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10.0,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextField(
+                        controller: emailTextEditingController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(
+                            fontSize: 14.0,
+                          ),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.0,
+                          ),
                         ),
                       ),
-                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextField(
+                        controller: phoneTextEditingController,
+                        keyboardType: TextInputType.phone,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Phone',
+                          labelStyle: TextStyle(
+                            fontSize: 14.0,
+                          ),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextField(
+                        obscureText: true,
+                        controller: passwordTextEditingController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            fontSize: 14.0,
+                          ),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.0,
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 10.0,
                     ),
-                    RaisedButton(
-                      color: Colors.yellow,
-                      textColor: Colors.white,
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green),
+                      ),
                       child: Container(
+                        width: 200,
                         height: 50.0,
                         child: Center(
                           child: Text(
@@ -136,9 +145,6 @@ class RegisterationScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ),
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(24.0),
                       ),
                       onPressed: () {
                         if (nameTextEditingController.text.length < 3) {
@@ -164,7 +170,11 @@ class RegisterationScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              FlatButton(
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.green),
+                ),
                 onPressed: () {
                   Navigator.pushNamedAndRemoveUntil(
                       context, LoginScreen.idScreen, (route) => false);

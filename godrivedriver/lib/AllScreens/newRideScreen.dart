@@ -59,7 +59,7 @@ class _NewRideScreenState extends State<NewRideScreen> {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context, size: Size(2, 2));
       BitmapDescriptor.fromAssetImage(
-              imageConfiguration, "images/car_android.png")
+              imageConfiguration, "assets/images/car_android.png")
           .then((value) {
         animatingMarkerIcon = value;
       });
@@ -160,7 +160,7 @@ class _NewRideScreenState extends State<NewRideScreen> {
                   ),
                 ],
               ),
-              height: 270.0,
+              height: 300.0,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
                 child: Column(
@@ -169,7 +169,7 @@ class _NewRideScreenState extends State<NewRideScreen> {
                       durationRide,
                       style: TextStyle(
                           fontSize: 14.0,
-                          fontFamily: "Brand Bold",
+                          // fontFamily: "Brand Bold",
                           color: Colors.deepPurple),
                     ),
                     SizedBox(
@@ -195,7 +195,7 @@ class _NewRideScreenState extends State<NewRideScreen> {
                     Row(
                       children: [
                         Image.asset(
-                          "images/pickicon.png",
+                          "assets/images/pickicon.png",
                           height: 16.0,
                           width: 16.0,
                         ),
@@ -219,7 +219,7 @@ class _NewRideScreenState extends State<NewRideScreen> {
                     Row(
                       children: [
                         Image.asset(
-                          "images/desticon.png",
+                          "assets/images/desticon.png",
                           height: 16.0,
                           width: 16.0,
                         ),

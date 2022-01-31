@@ -8,9 +8,7 @@ import 'package:godrivedriver/AllScreens/mainscreen.dart';
 import 'package:godrivedriver/AllWidgets/progressDialog.dart';
 import 'package:godrivedriver/main.dart';
 
-
-class RegisterationScreen extends StatelessWidget
-{
+class RegisterationScreen extends StatelessWidget {
   static const String idScreen = "register";
 
   TextEditingController nameTextEditingController = TextEditingController();
@@ -27,27 +25,30 @@ class RegisterationScreen extends StatelessWidget
           padding: EdgeInsets.all(8.0),
           child: Column(
             children: [
-              SizedBox(height: 20.0,),
+              SizedBox(
+                height: 20.0,
+              ),
               Image(
-                image: AssetImage("images/logo.png"),
+                image: AssetImage("assets/images/logo.png"),
                 width: 390.0,
                 height: 250.0,
                 alignment: Alignment.center,
               ),
-
-              SizedBox(height: 1.0,),
+              SizedBox(
+                height: 1.0,
+              ),
               Text(
                 "Register as a Driver",
                 style: TextStyle(fontSize: 24.0, fontFamily: "Brand Bold"),
                 textAlign: TextAlign.center,
               ),
-
               Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-
-                    SizedBox(height: 1.0,),
+                    SizedBox(
+                      height: 1.0,
+                    ),
                     TextField(
                       controller: nameTextEditingController,
                       keyboardType: TextInputType.text,
@@ -63,8 +64,9 @@ class RegisterationScreen extends StatelessWidget
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
-
-                    SizedBox(height: 1.0,),
+                    SizedBox(
+                      height: 1.0,
+                    ),
                     TextField(
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
@@ -80,8 +82,9 @@ class RegisterationScreen extends StatelessWidget
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
-
-                    SizedBox(height: 1.0,),
+                    SizedBox(
+                      height: 1.0,
+                    ),
                     TextField(
                       controller: phoneTextEditingController,
                       keyboardType: TextInputType.phone,
@@ -97,8 +100,9 @@ class RegisterationScreen extends StatelessWidget
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
-
-                    SizedBox(height: 1.0,),
+                    SizedBox(
+                      height: 1.0,
+                    ),
                     TextField(
                       controller: passwordTextEditingController,
                       obscureText: true,
@@ -114,8 +118,9 @@ class RegisterationScreen extends StatelessWidget
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
-
-                    SizedBox(height: 20.0,),
+                    SizedBox(
+                      height: 20.0,
+                    ),
                     RaisedButton(
                       color: Colors.yellow,
                       textColor: Colors.white,
@@ -124,46 +129,42 @@ class RegisterationScreen extends StatelessWidget
                         child: Center(
                           child: Text(
                             "Create Account",
-                            style: TextStyle(fontSize: 18.0, fontFamily: "Brand Bold"),
+                            style: TextStyle(
+                                fontSize: 18.0, fontFamily: "Brand Bold"),
                           ),
                         ),
                       ),
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(24.0),
                       ),
-                      onPressed: ()
-                      {
-                        if(nameTextEditingController.text.length < 3)
-                        {
-                          displayToastMessage("name must be atleast 3 Characters.", context);
-                        }
-                        else if(!emailTextEditingController.text.contains("@"))
-                        {
-                          displayToastMessage("Email address is not Valid.", context);
-                        }
-                        else if(phoneTextEditingController.text.isEmpty)
-                        {
-                          displayToastMessage("Phone Number is mandatory.", context);
-                        }
-                        else if(passwordTextEditingController.text.length < 6)
-                        {
-                          displayToastMessage("Password must be atleast 6 Characters.", context);
-                        }
-                        else
-                        {
+                      onPressed: () {
+                        if (nameTextEditingController.text.length < 3) {
+                          displayToastMessage(
+                              "name must be atleast 3 Characters.", context);
+                        } else if (!emailTextEditingController.text
+                            .contains("@")) {
+                          displayToastMessage(
+                              "Email address is not Valid.", context);
+                        } else if (phoneTextEditingController.text.isEmpty) {
+                          displayToastMessage(
+                              "Phone Number is mandatory.", context);
+                        } else if (passwordTextEditingController.text.length <
+                            6) {
+                          displayToastMessage(
+                              "Password must be atleast 6 Characters.",
+                              context);
+                        } else {
                           registerNewUser(context);
                         }
                       },
                     ),
-
                   ],
                 ),
               ),
-
               FlatButton(
-                onPressed: ()
-                {
-                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginScreen.idScreen, (route) => false);
                 },
                 child: Text(
                   "Already have an Account? Login Here",
@@ -176,30 +177,31 @@ class RegisterationScreen extends StatelessWidget
     );
   }
 
-
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  void registerNewUser(BuildContext context) async
-  {
+  void registerNewUser(BuildContext context) async {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context)
-        {
-          return ProgressDialog(message: "Registering, Please wait...",);
-        }
-    );
+        builder: (BuildContext context) {
+          return ProgressDialog(
+            message: "Registering, Please wait...",
+          );
+        });
 
     final User firebaseUser = (await _firebaseAuth
-        .createUserWithEmailAndPassword(
-        email: emailTextEditingController.text,
-        password: passwordTextEditingController.text
-    ).catchError((errMsg){
+            .createUserWithEmailAndPassword(
+                email: emailTextEditingController.text,
+                password: passwordTextEditingController.text)
+            .catchError((errMsg) {
       Navigator.pop(context);
-      displayToastMessage("Error: " + errMsg.toString(), context);
-    })).user;
 
-    if(firebaseUser != null) //user created
+      print("44444444444444444444444444" + errMsg.toString());
+      displayToastMessage("Error: " + errMsg.toString(), context);
+    }))
+        .user;
+
+    if (firebaseUser != null) //user created
     {
       //save user info to database
       Map userDataMap = {
@@ -212,12 +214,11 @@ class RegisterationScreen extends StatelessWidget
 
       currentfirebaseUser = firebaseUser;
 
-      displayToastMessage("Congratulations, your account has been created.", context);
+      displayToastMessage(
+          "Congratulations, your account has been created.", context);
 
       Navigator.pushNamed(context, CarInfoScreen.idScreen);
-    }
-    else
-    {
+    } else {
       Navigator.pop(context);
       //error occured - display error msg
       displayToastMessage("New user account has not been Created.", context);
@@ -225,7 +226,6 @@ class RegisterationScreen extends StatelessWidget
   }
 }
 
-displayToastMessage(String message, BuildContext context)
-{
+displayToastMessage(String message, BuildContext context) {
   Fluttertoast.showToast(msg: message);
 }

@@ -1,4 +1,3 @@
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:godrivedriver/AllScreens/newRideScreen.dart';
@@ -9,15 +8,13 @@ import 'package:godrivedriver/Models/rideDetails.dart';
 import '../configMaps.dart';
 import '../main.dart';
 
-class NotificationDialog extends StatelessWidget
-{
+class NotificationDialog extends StatelessWidget {
   final RideDetails rideDetails;
 
   NotificationDialog({this.rideDetails});
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       backgroundColor: Colors.transparent,
@@ -33,55 +30,80 @@ class NotificationDialog extends StatelessWidget
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 10.0),
-            Image.asset("assets/images/taxi.png", width: 150.0,),
-            SizedBox(height: 0.0,),
-            Text("New Ride Request", style: TextStyle(
-              // fontFamily: "Brand Bold",
-              fontSize: 20.0,),),
+            Image.asset(
+              "assets/images/taxi.png",
+              width: 150.0,
+            ),
+            SizedBox(
+              height: 0.0,
+            ),
+            Text(
+              "New Ride Request",
+              style: TextStyle(
+                // fontFamily: "Brand Bold",
+                fontSize: 20.0,
+              ),
+            ),
             SizedBox(height: 20.0),
             Padding(
               padding: EdgeInsets.all(18.0),
               child: Column(
                 children: [
-
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset("assets/images/pickicon.png", height: 16.0, width: 16.0,),
-                      SizedBox(width: 20.0,),
+                      Image.asset(
+                        "assets/images/pickicon.png",
+                        height: 16.0,
+                        width: 16.0,
+                      ),
+                      SizedBox(
+                        width: 20.0,
+                      ),
                       Expanded(
-                        child: Container(child: Text(rideDetails.pickup_address, style: TextStyle(fontSize: 18.0),)),
+                        child: Container(
+                            child: Text(
+                          rideDetails.pickup_address,
+                          style: TextStyle(fontSize: 18.0),
+                        )),
                       ),
                     ],
                   ),
                   SizedBox(height: 20.0),
-
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset("assets/images/desticon.png", height: 16.0, width: 16.0,),
-                      SizedBox(width: 20.0,),
-                      Expanded(
-                          child: Container(child: Text(rideDetails.dropoff_address, style: TextStyle(fontSize: 18.0),))
+                      Image.asset(
+                        "assets/images/desticon.png",
+                        height: 16.0,
+                        width: 16.0,
                       ),
+                      SizedBox(
+                        width: 20.0,
+                      ),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                        rideDetails.dropoff_address,
+                        style: TextStyle(fontSize: 18.0),
+                      ))),
                     ],
                   ),
                   SizedBox(height: 0.0),
-
                 ],
               ),
             ),
-
             SizedBox(height: 15.0),
-            Divider(height: 2.0, thickness: 4.0,),
+            Divider(
+              height: 2.0,
+              thickness: 4.0,
+            ),
             SizedBox(height: 0.0),
-
             Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
                   FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
@@ -89,8 +111,7 @@ class NotificationDialog extends StatelessWidget
                     color: Colors.white,
                     textColor: Colors.red,
                     padding: EdgeInsets.all(8.0),
-                    onPressed: ()
-                    {
+                    onPressed: () {
                       assetsAudioPlayer.stop();
                       Navigator.pop(context);
                     },
@@ -101,15 +122,12 @@ class NotificationDialog extends StatelessWidget
                       ),
                     ),
                   ),
-
                   SizedBox(width: 25.0),
-
                   RaisedButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
                         side: BorderSide(color: Colors.green)),
-                    onPressed: ()
-                    {
+                    onPressed: () {
                       assetsAudioPlayer.stop();
                       checkAvailabilityOfRide(context);
                     },
@@ -118,11 +136,9 @@ class NotificationDialog extends StatelessWidget
                     child: Text("Accept".toUpperCase(),
                         style: TextStyle(fontSize: 14)),
                   ),
-
                 ],
               ),
             ),
-
             SizedBox(height: 0.0),
           ],
         ),
@@ -130,37 +146,28 @@ class NotificationDialog extends StatelessWidget
     );
   }
 
-  void checkAvailabilityOfRide(context)
-  {
-    rideRequestRef.once().then((DataSnapshot dataSnapShot){
+  void checkAvailabilityOfRide(context) {
+    rideRequestRef.once().then((DataSnapshot dataSnapShot) {
       Navigator.pop(context);
       String theRideId = "";
-      if(dataSnapShot.value != null)
-      {
+      if (dataSnapShot.value != null) {
         theRideId = dataSnapShot.value.toString();
-      }
-      else
-      {
+      } else {
         displayToastMessage("Ride not exists.", context);
       }
 
-
-      if(theRideId == rideDetails.ride_request_id)
-      {
+      if (theRideId == rideDetails.ride_request_id) {
         rideRequestRef.set("accepted");
         AssistantMethods.disableHomeTabLiveLocationUpdates();
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> NewRideScreen(rideDetails: rideDetails)));
-      }
-      else if(theRideId == "cancelled")
-      {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NewRideScreen(rideDetails: rideDetails)));
+      } else if (theRideId == "cancelled") {
         displayToastMessage("Ride has been Cancelled.", context);
-      }
-      else if(theRideId == "timeout")
-      {
+      } else if (theRideId == "timeout") {
         displayToastMessage("Ride has time out.", context);
-      }
-      else
-      {
+      } else {
         displayToastMessage("Ride not exists.", context);
       }
     });

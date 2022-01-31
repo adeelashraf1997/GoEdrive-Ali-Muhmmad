@@ -33,7 +33,7 @@ class EarningsTabPage extends StatelessWidget {
             padding:  EdgeInsets.symmetric(horizontal: 30, vertical: 18),
             child: Row(
               children: [
-                Image.asset('images/uberx.png', width: 70,),
+                Image.asset('assets/images/taxi.png', width: 70,),
                 SizedBox(width: 16,),
                 Text('Total Trips', style: TextStyle(fontSize: 16), ),
                 Expanded(child: Container(child: Text(Provider.of<AppData>(context, listen: false).countTrips.toString(), textAlign: TextAlign.end, style: TextStyle(fontSize: 18),))),

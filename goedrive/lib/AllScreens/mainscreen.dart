@@ -7,6 +7,8 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:goedrive/AllScreens/privacypolicy.dart';
+import 'package:goedrive/AllScreens/termsandcondition.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:goedrive/AllScreens/HistoryScreen.dart';
@@ -30,21 +32,14 @@ import 'package:goedrive/configMaps.dart';
 import 'package:goedrive/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
-
-class MainScreen extends StatefulWidget
-{
+class MainScreen extends StatefulWidget {
   static const String idScreen = "mainScreen";
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-
-
-
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
-{
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Completer<GoogleMapController> _controllerGoogleMap = Completer();
   GoogleMapController newGoogleMapController;
 
@@ -81,8 +76,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
 
   bool isRequestingPositionDetails = false;
 
-  String uName="";
-
+  String uName = "";
 
   @override
   void initState() {
@@ -92,27 +86,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     AssistantMethods.getCurrentOnlineUserInfo();
   }
 
-  void saveRideRequest()
-  {
-    rideRequestRef = FirebaseDatabase.instance.reference().child("rideRequest").push();
+  void saveRideRequest() {
+    rideRequestRef =
+        FirebaseDatabase.instance.reference().child("rideRequest").push();
 
     var pickUp = Provider.of<AppData>(context, listen: false).pickUpLocation;
     var dropOff = Provider.of<AppData>(context, listen: false).dropOffLocation;
 
-    Map pickUpLocMap =
-    {
+    Map pickUpLocMap = {
       "latitude": pickUp.latitude.toString(),
       "longitude": pickUp.longitude.toString(),
     };
 
-    Map dropOffLocMap =
-    {
+    Map dropOffLocMap = {
       "latitude": dropOff.latitude.toString(),
       "longitude": dropOff.longitude.toString(),
     };
 
-    Map rideInfoMap =
-    {
+    Map rideInfoMap = {
       "driver_id": "waiting",
       "payment_method": "cash",
       "pickup": pickUpLocMap,
@@ -128,82 +119,72 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     rideRequestRef.set(rideInfoMap);
 
     rideStreamSubscription = rideRequestRef.onValue.listen((event) async {
-      if(event.snapshot.value == null)
-      {
+      if (event.snapshot.value == null) {
         return;
       }
 
-      if(event.snapshot.value["car_details"] != null)
-      {
+      if (event.snapshot.value["car_details"] != null) {
         setState(() {
           carDetailsDriver = event.snapshot.value["car_details"].toString();
         });
       }
-      if(event.snapshot.value["driver_name"] != null)
-      {
+      if (event.snapshot.value["driver_name"] != null) {
         setState(() {
           driverName = event.snapshot.value["driver_name"].toString();
         });
       }
-      if(event.snapshot.value["driver_phone"] != null)
-      {
+      if (event.snapshot.value["driver_phone"] != null) {
         setState(() {
           driverphone = event.snapshot.value["driver_phone"].toString();
         });
       }
 
-      if(event.snapshot.value["driver_location"] != null)
-      {
-        double driverLat = double.parse(event.snapshot.value["driver_location"]["latitude"].toString());
-        double driverLng = double.parse(event.snapshot.value["driver_location"]["longitude"].toString());
+      if (event.snapshot.value["driver_location"] != null) {
+        double driverLat = double.parse(
+            event.snapshot.value["driver_location"]["latitude"].toString());
+        double driverLng = double.parse(
+            event.snapshot.value["driver_location"]["longitude"].toString());
         LatLng driverCurrentLocation = LatLng(driverLat, driverLng);
 
-        if(statusRide == "accepted")
-        {
+        if (statusRide == "accepted") {
           updateRideTimeToPickUpLoc(driverCurrentLocation);
-        }
-        else if(statusRide == "onride")
-        {
+        } else if (statusRide == "onride") {
           updateRideTimeToDropOffLoc(driverCurrentLocation);
-        }
-        else if(statusRide == "arrived")
-        {
+        } else if (statusRide == "arrived") {
           setState(() {
             rideStatus = "Driver has Arrived.";
           });
         }
       }
 
-      if(event.snapshot.value["status"] != null)
-      {
+      if (event.snapshot.value["status"] != null) {
         statusRide = event.snapshot.value["status"].toString();
       }
-      if(statusRide == "accepted")
-      {
+      if (statusRide == "accepted") {
         displayDriverDetailsContainer();
         Geofire.stopListener();
         deleteGeofileMarkers();
       }
-      if(statusRide == "ended")
-      {
-        if(event.snapshot.value["fares"] != null)
-        {
+      if (statusRide == "ended") {
+        if (event.snapshot.value["fares"] != null) {
           int fare = int.parse(event.snapshot.value["fares"].toString());
           var res = await showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (BuildContext context)=> CollectFareDialog(paymentMethod: "cash", fareAmount: fare,),
+            builder: (BuildContext context) => CollectFareDialog(
+              paymentMethod: "cash",
+              fareAmount: fare,
+            ),
           );
 
-          String driverId="";
-          if(res == "close")
-          {
-            if(event.snapshot.value["driver_id"] != null)
-            {
+          String driverId = "";
+          if (res == "close") {
+            if (event.snapshot.value["driver_id"] != null) {
               driverId = event.snapshot.value["driver_id"].toString();
             }
 
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => RatingScreen(driverId: driverId)));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => RatingScreen(driverId: driverId)));
 
             rideRequestRef.onDisconnect();
             rideRequestRef = null;
@@ -215,24 +196,23 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
       }
     });
   }
-  
-  void deleteGeofileMarkers()
-  {
+
+  void deleteGeofileMarkers() {
     setState(() {
-      markersSet.removeWhere((element) => element.markerId.value.contains("driver"));
+      markersSet
+          .removeWhere((element) => element.markerId.value.contains("driver"));
     });
   }
 
-  void updateRideTimeToPickUpLoc(LatLng driverCurrentLocation) async
-  {
-    if(isRequestingPositionDetails == false)
-    {
+  void updateRideTimeToPickUpLoc(LatLng driverCurrentLocation) async {
+    if (isRequestingPositionDetails == false) {
       isRequestingPositionDetails = true;
 
-      var positionUserLatLng = LatLng(currentPosition.latitude, currentPosition.longitude);
-      var details = await AssistantMethods.obtainPlaceDirectionDetails(driverCurrentLocation, positionUserLatLng);
-      if(details == null)
-      {
+      var positionUserLatLng =
+          LatLng(currentPosition.latitude, currentPosition.longitude);
+      var details = await AssistantMethods.obtainPlaceDirectionDetails(
+          driverCurrentLocation, positionUserLatLng);
+      if (details == null) {
         return;
       }
       setState(() {
@@ -243,18 +223,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     }
   }
 
-  void updateRideTimeToDropOffLoc(LatLng driverCurrentLocation) async
-  {
-    if(isRequestingPositionDetails == false)
-    {
+  void updateRideTimeToDropOffLoc(LatLng driverCurrentLocation) async {
+    if (isRequestingPositionDetails == false) {
       isRequestingPositionDetails = true;
 
-      var dropOff = Provider.of<AppData>(context, listen: false).dropOffLocation;
+      var dropOff =
+          Provider.of<AppData>(context, listen: false).dropOffLocation;
       var dropOffUserLatLng = LatLng(dropOff.latitude, dropOff.longitude);
 
-      var details = await AssistantMethods.obtainPlaceDirectionDetails(driverCurrentLocation, dropOffUserLatLng);
-      if(details == null)
-      {
+      var details = await AssistantMethods.obtainPlaceDirectionDetails(
+          driverCurrentLocation, dropOffUserLatLng);
+      if (details == null) {
         return;
       }
       setState(() {
@@ -265,16 +244,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     }
   }
 
-  void cancelRideRequest()
-  {
+  void cancelRideRequest() {
     rideRequestRef.remove();
     setState(() {
       state = "normal";
     });
   }
 
-  void displayRequestRideContainer()
-  {
+  void displayRequestRideContainer() {
     setState(() {
       requestRideContainerHeight = 250.0;
       rideDetailsContainerHeight = 0;
@@ -285,8 +262,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     saveRideRequest();
   }
 
-  void displayDriverDetailsContainer()
-  {
+  void displayDriverDetailsContainer() {
     setState(() {
       requestRideContainerHeight = 0.0;
       rideDetailsContainerHeight = 0.0;
@@ -295,8 +271,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     });
   }
 
-  resetApp()
-  {
+  resetApp() {
     setState(() {
       drawerOpen = true;
       searchContainerHeight = 300.0;
@@ -320,8 +295,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     locatePosition();
   }
 
-  void displayRideDetailsContainer() async
-  {
+  void displayRideDetailsContainer() async {
     await getPlaceDirection();
 
     setState(() {
@@ -332,17 +306,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     });
   }
 
-  void locatePosition() async
-  {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  void locatePosition() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     currentPosition = position;
 
     LatLng latLatPosition = LatLng(position.latitude, position.longitude);
 
-    CameraPosition cameraPosition = new CameraPosition(target: latLatPosition, zoom: 14);
-    newGoogleMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    CameraPosition cameraPosition =
+        new CameraPosition(target: latLatPosition, zoom: 14);
+    newGoogleMapController
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    String address = await AssistantMethods.searchCoordinateAddress(position, context);
+    String address =
+        await AssistantMethods.searchCoordinateAddress(position, context);
     print("This is your Address :: " + address);
 
     initGeoFireListner();
@@ -372,25 +349,41 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
               Container(
                 height: 165.0,
                 child: DrawerHeader(
-                  decoration: BoxDecoration(color: Colors.white),
+                  decoration: BoxDecoration(color: Colors.green),
                   child: Row(
                     children: [
-                      Image.asset("assets/images/taxi.png", height: 65.0, width: 65.0,),
-                      SizedBox(width: 16.0,),
+                      Image.asset(
+                        "assets/images/user_icon.png",
+                        height: 65.0,
+                        width: 65.0,
+                      ),
+                      SizedBox(
+                        width: 16.0,
+                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(uName, style: TextStyle(fontSize: 16.0,
-                            //fontFamily: "Brand Bold",
-                          ),),
-                          SizedBox(height: 6.0,),
-                          GestureDetector(
-                              onTap: ()
-                              {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileTabPage()));
-                              },
-                              child: Text("Visit Profile")
+                          Text(
+                            uName,
+                            style: TextStyle(fontSize: 16.0, color: Colors.white
+                                //fontFamily: "Brand Bold",
+                                ),
                           ),
+                          SizedBox(
+                            height: 6.0,
+                          ),
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileTabPage()));
+                              },
+                              child: Text(
+                                "Visit Profile",
+                                style: TextStyle(color: Colors.white),
+                              )),
                         ],
                       ),
                     ],
@@ -398,50 +391,95 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
                 ),
               ),
 
-              DividerWidget(),
-
-              SizedBox(height: 12.0,),
+              SizedBox(
+                height: 5.0,
+              ),
 
               //Drawer Body Contrllers
               GestureDetector(
-                onTap: ()
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> HistoryScreen()));
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MainScreen()));
                 },
                 child: ListTile(
-                  leading: Icon(Icons.history),
-                  title: Text("History", style: TextStyle(fontSize: 15.0),),
+                  leading: Icon(Icons.home),
+                  title: Text(
+                    "Home",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
               ),
+              Divider(),
               GestureDetector(
-                onTap: ()
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileTabPage()));
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfileTabPage()));
                 },
                 child: ListTile(
                   leading: Icon(Icons.person),
-                  title: Text("Visit Profile", style: TextStyle(fontSize: 15.0),),
+                  title: Text(
+                    "Profile",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
               ),
+              Divider(),
               GestureDetector(
-                onTap: ()
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> AboutScreen()));
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HistoryScreen()));
+                },
+                child: ListTile(
+                  leading: Icon(Icons.history),
+                  title: Text(
+                    "History",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
+                ),
+              ),
+              Divider(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => privacy()));
+                },
+                child: ListTile(
+                  leading: Icon(Icons.crop_rounded),
+                  title: Text(
+                    "Terms & Condition",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
+                ),
+              ),
+              Divider(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Terms()));
                 },
                 child: ListTile(
                   leading: Icon(Icons.info),
-                  title: Text("About", style: TextStyle(fontSize: 15.0),),
+                  title: Text(
+                    "Privacy & Policy",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
               ),
+              Divider(),
               GestureDetector(
-                onTap: ()
-                {
+                onTap: () {
                   FirebaseAuth.instance.signOut();
-                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginScreen.idScreen, (route) => false);
                 },
                 child: ListTile(
                   leading: Icon(Icons.logout),
-                  title: Text("Sign Out", style: TextStyle(fontSize: 15.0),),
+                  title: Text(
+                    "Sign Out",
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
               ),
             ],
@@ -461,8 +499,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             polylines: polylineSet,
             markers: markersSet,
             circles: circlesSet,
-            onMapCreated: (GoogleMapController controller)
-            {
+            onMapCreated: (GoogleMapController controller) {
               _controllerGoogleMap.complete(controller);
               newGoogleMapController = controller;
 
@@ -479,14 +516,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             top: 36.0,
             left: 22.0,
             child: GestureDetector(
-              onTap: ()
-              {
-                if(drawerOpen)
-                {
+              onTap: () {
+                if (drawerOpen) {
                   scaffoldKey.currentState.openDrawer();
-                }
-                else
-                {
+                } else {
                   resetApp();
                 }
               },
@@ -508,7 +541,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
                 ),
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  child: Icon((drawerOpen) ? Icons.menu : Icons.close, color: Colors.black,),
+                  child: Icon(
+                    (drawerOpen) ? Icons.menu : Icons.close,
+                    color: Colors.black,
+                  ),
                   radius: 20.0,
                 ),
               ),
@@ -520,6 +556,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             left: 0.0,
             right: 0.0,
             bottom: 0.0,
+            height: 200,
             child: AnimatedSize(
               vsync: this,
               curve: Curves.bounceIn,
@@ -527,104 +564,105 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
               child: Container(
                 height: searchContainerHeight,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 16.0,
-                      spreadRadius: 0.5,
-                      offset: Offset(0.7, 0.7),
-                    ),
-                  ],
+                  color: Colors.green,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0)),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 18.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 6.0),
-                      Text("Hi there,", style: TextStyle(fontSize: 12.0),),
-                      Text("Where to?", style: TextStyle(fontSize: 20.0,
-                        //fontFamily: "Brand Bold",
-                      ),),
-                      SizedBox(height: 20.0),
-
-                      GestureDetector(
-                        onTap: () async
-                        {
-                          var res = await Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-
-                          if(res == "obtainDirection")
-                          {
-                            displayRideDetailsContainer();
-                          }
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black54,
-                                  blurRadius: 6.0,
-                                  spreadRadius: 0.5,
-                                  offset: Offset(0.7, 0.7),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search, color: Colors.blueAccent,),
-                                  SizedBox(width: 10.0,),
-                                  Text("Search Drop Off"),
-                                ],
-                              ),
-                            ),
-                          ),
+                      Text(
+                        "Hi there,",
+                        style: TextStyle(
+                            color: Color(0xffF2F2F2),
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold),
                       ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Where to?",
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Color(0xffF2F2F2),
 
-                      SizedBox(height: 24.0),
+                          //fontFamily: "Brand Bold",
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         children: [
-                          Icon(Icons.home, color: Colors.grey,),
-                          SizedBox(width: 12.0,),
+                          Icon(
+                            Icons.location_on,
+                            color: Color(0xffF2F2F2),
+                          ),
+                          SizedBox(
+                            width: 12.0,
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                Provider.of<AppData>(context).pickUpLocation != null
-                                    ? Provider.of<AppData>(context).pickUpLocation.userplaceName
+                                Provider.of<AppData>(context).pickUpLocation !=
+                                        null
+                                    ? Provider.of<AppData>(context)
+                                        .pickUpLocation
+                                        .userplaceName
                                     : "Add Home",
+                                style: TextStyle(color: Color(0xffF2F2F2)),
                               ),
-                              SizedBox(height: 4.0,),
-                              Text("Your living home address", style: TextStyle(color: Colors.black54, fontSize: 12.0),),
                             ],
                           ),
                         ],
                       ),
+                      SizedBox(height: 4.0),
+                      Divider(
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 4.0),
+                      GestureDetector(
+                        onTap: () async {
+                          var res = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchScreen()));
 
-                      SizedBox(height: 10.0),
-
-                      DividerWidget(),
-
-                      SizedBox(height: 16.0),
-
-                      Row(
-                        children: [
-                          Icon(Icons.work, color: Colors.grey,),
-                          SizedBox(width: 12.0,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Add Work"),
-                              SizedBox(height: 4.0,),
-                              Text("Your office address", style: TextStyle(color: Colors.black54, fontSize: 12.0),),
-                            ],
+                          if (res == "obtainDirection") {
+                            displayRideDetailsContainer();
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Color(0xffF2F2F2),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
-                        ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(
+                                  width: 10.0,
+                                ),
+                                Text(
+                                  "Search Drop Off",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -645,27 +683,22 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
               child: Container(
                 height: rideDetailsContainerHeight,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0),),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 16.0,
-                      spreadRadius: 0.5,
-                      offset: Offset(0.7, 0.7),
-                    ),
-                  ],
+                  color: Colors.green,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
+                  ),
                 ),
-
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 17.0),
+                  padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 15),
                   child: Column(
                     children: [
-
                       //bike ride
+                      SizedBox(
+                        height: 5,
+                      ),
                       GestureDetector(
-                        onTap: ()
-                        {
+                        onTap: () {
                           displayToastMessage("searching Bike...", context);
 
                           setState(() {
@@ -673,35 +706,58 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
                             carRideType = "bike";
                           });
                           displayRequestRideContainer();
-                          availableDrivers = GeoFireAssistant.nearByAvailableDriversList;
+                          availableDrivers =
+                              GeoFireAssistant.nearByAvailableDriversList;
                           searchNearestDriver();
                         },
                         child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[300],
+                              border:
+                                  Border.all(color: Colors.green, width: 2.0)),
                           width: double.infinity,
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                Image.asset("assets/images/taxi.png", height: 70.0, width: 80.0,),
-                                SizedBox(width: 16.0,),
+                                Image.asset(
+                                  "assets/images/taxi.png",
+                                  height: 70.0,
+                                  width: 80.0,
+                                ),
+                                SizedBox(
+                                  width: 16.0,
+                                ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Bike", style: TextStyle(fontSize: 18.0,
-                                      //fontFamily: "Brand Bold",
-                                    ),
+                                      "Bike",
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        //fontFamily: "Brand Bold",
+                                      ),
                                     ),
                                     Text(
-                                      ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
+                                      ((tripDirectionDetails != null)
+                                          ? tripDirectionDetails.distanceText
+                                          : ''),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 Expanded(child: Container()),
                                 Text(
-                                  ((tripDirectionDetails != null) ? '\$${(AssistantMethods.calculateFares(tripDirectionDetails))/2}' : ''), style: TextStyle(
-                                  //fontFamily: "Brand Bold",
-                                ),
+                                  ((tripDirectionDetails != null)
+                                      ? '${(AssistantMethods.calculateFares(tripDirectionDetails)) / 2}\.Pkr'
+                                      : ''),
+                                  style: TextStyle(
+                                      //fontFamily: "Brand Bold",
+                                      ),
                                 ),
                               ],
                             ),
@@ -709,101 +765,206 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
                         ),
                       ),
 
-                      SizedBox(height: 10.0,),
-                      Divider(height: 2.0, thickness: 2.0,),
-                      SizedBox(height: 10.0,),
+                      // Auto
+                      GestureDetector(
+                        onTap: () {
+                          displayToastMessage("searching Auto...", context);
+
+                          setState(() {
+                            state = "requesting";
+                            carRideType = "Auto";
+                          });
+                          displayRequestRideContainer();
+                          availableDrivers =
+                              GeoFireAssistant.nearByAvailableDriversList;
+                          searchNearestDriver();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[300],
+                              border:
+                                  Border.all(color: Colors.green, width: 2.0)),
+                          width: double.infinity,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  "assets/images/taxi.png",
+                                  height: 70.0,
+                                  width: 80.0,
+                                ),
+                                SizedBox(
+                                  width: 16.0,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Auto",
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        //fontFamily: "Brand Bold",
+                                      ),
+                                    ),
+                                    Text(
+                                      ((tripDirectionDetails != null)
+                                          ? tripDirectionDetails.distanceText
+                                          : ''),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Expanded(child: Container()),
+                                Text(
+                                  ((tripDirectionDetails != null)
+                                      ? '${(AssistantMethods.calculateFares(tripDirectionDetails)) / 2}\.Pkr'
+                                      : ''),
+                                  style: TextStyle(
+                                      //fontFamily: "Brand Bold",
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
                       //uber-go ride
                       GestureDetector(
-                        onTap: ()
-                        {
-                          displayToastMessage("searching Uber-Go...", context);
+                        onTap: () {
+                          displayToastMessage("searching Mini...", context);
 
                           setState(() {
                             state = "requesting";
-                            carRideType = "uber-go";
+                            carRideType = "Mini";
                           });
                           displayRequestRideContainer();
-                          availableDrivers = GeoFireAssistant.nearByAvailableDriversList;
+                          availableDrivers =
+                              GeoFireAssistant.nearByAvailableDriversList;
                           searchNearestDriver();
                         },
                         child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[300],
+                              border:
+                                  Border.all(color: Colors.green, width: 2.0)),
                           width: double.infinity,
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                Image.asset("assets/images/taxi.png", height: 70.0, width: 80.0,),
-                                SizedBox(width: 16.0,),
+                                Image.asset(
+                                  "assets/images/taxi.png",
+                                  height: 70.0,
+                                  width: 80.0,
+                                ),
+                                SizedBox(
+                                  width: 16.0,
+                                ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Uber-Go", style: TextStyle(fontSize: 18.0,
-                                      //fontFamily: "Brand Bold",
-                                    ),
+                                      "Mini",
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        //fontFamily: "Brand Bold",
+                                      ),
                                     ),
                                     Text(
-                                      ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
+                                      ((tripDirectionDetails != null)
+                                          ? tripDirectionDetails.distanceText
+                                          : ''),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 Expanded(child: Container()),
                                 Text(
-                                  ((tripDirectionDetails != null) ? '\$${AssistantMethods.calculateFares(tripDirectionDetails)}' : ''), style: TextStyle(
-                                  //fontFamily: "Brand Bold",
-                                ),
+                                  ((tripDirectionDetails != null)
+                                      ? '${AssistantMethods.calculateFares(tripDirectionDetails)}\.Pkr'
+                                      : ''),
+                                  style: TextStyle(
+                                      //fontFamily: "Brand Bold",
+                                      ),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       ),
-
-                      SizedBox(height: 10.0,),
-                      Divider(height: 2.0, thickness: 2.0,),
-                      SizedBox(height: 10.0,),
-
                       //uber-x ride
                       GestureDetector(
-                        onTap: ()
-                        {
-                          displayToastMessage("searching Uber-X...", context);
+                        onTap: () {
+                          displayToastMessage(
+                              "searching Go E Mini...", context);
 
                           setState(() {
                             state = "requesting";
-                            carRideType = "uber-x";
+                            carRideType = "Go E Mini";
                           });
                           displayRequestRideContainer();
-                          availableDrivers = GeoFireAssistant.nearByAvailableDriversList;
+                          availableDrivers =
+                              GeoFireAssistant.nearByAvailableDriversList;
                           searchNearestDriver();
                         },
                         child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[300],
+                              border:
+                                  Border.all(color: Colors.green, width: 2.0)),
                           width: double.infinity,
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                Image.asset("assets/images/taxi.png", height: 70.0, width: 80.0,),
-                                SizedBox(width: 16.0,),
+                                Image.asset(
+                                  "assets/images/taxi.png",
+                                  height: 70.0,
+                                  width: 80.0,
+                                ),
+                                SizedBox(
+                                  width: 16.0,
+                                ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Uber-X", style: TextStyle(fontSize: 18.0,
-                                      //fontFamily : "Brand Bold",
-                                    ),
+                                      "Go E Mini",
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        //fontFamily : "Brand Bold",
+                                      ),
                                     ),
                                     Text(
-                                      ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
+                                      ((tripDirectionDetails != null)
+                                          ? tripDirectionDetails.distanceText
+                                          : ''),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 Expanded(child: Container()),
                                 Text(
-                                  ((tripDirectionDetails != null) ? '\$${(AssistantMethods.calculateFares(tripDirectionDetails))*2}' : ''), style: TextStyle(
-                                  //fontFamily: "Brand Bold",
-                                ),
+                                  ((tripDirectionDetails != null)
+                                      ? '${(AssistantMethods.calculateFares(tripDirectionDetails)) * 2}\.Pkr'
+                                      : ''),
+                                  style: TextStyle(
+                                      //fontFamily: "Brand Bold",
+                                      ),
                                 ),
                               ],
                             ),
@@ -811,19 +972,44 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
                         ),
                       ),
 
-                      SizedBox(height: 10.0,),
-                      Divider(height: 2.0, thickness: 2.0,),
-                      SizedBox(height: 10.0,),
-
+                      SizedBox(
+                        height: 10,
+                      ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
                         child: Row(
                           children: [
-                            Icon(FontAwesomeIcons.moneyCheckAlt, size: 18.0, color: Colors.black54,),
-                            SizedBox(width: 16.0,),
-                            Text("Cash"),
-                            SizedBox(width: 6.0,),
-                            Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16.0,),
+                            Icon(
+                              FontAwesomeIcons.moneyCheckAlt,
+                              size: 18.0,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 16.0,
+                            ),
+                            Text(
+                              "Cash Payment ",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                            SizedBox(
+                              width: 6.0,
+                            ),
+                            Icon(
+                              Icons.arrow_right_alt,
+                              color: Colors.white,
+                              size: 20.0,
+                            ),
+                            Text(
+                              "Add Code ",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                            Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: 25.0,
+                            ),
                           ],
                         ),
                       ),
@@ -841,7 +1027,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             right: 0.0,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0),),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
@@ -854,64 +1043,72 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
               ),
               height: requestRideContainerHeight,
               child: Padding(
-                padding: const EdgeInsets.all(30.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    SizedBox(height: 5.0,),
-
                     SizedBox(
-                        width: double.infinity,
-                        child: ColorizeAnimatedTextKit(
-                          onTap: () {
-                            print("Tap Event");
-                          },
-                          text: [
-                            "Requesting a Ride...",
-                            "Please wait...",
-                            "Finding a Driver...",
-                          ],
-                          textStyle: TextStyle(
-                            fontSize: 15.0,
-                            //fontFamily: "Signatra"
-                          ),
-                          colors: [
-                            Colors.green,
-                            Colors.purple,
-                            Colors.pink,
-                            Colors.blue,
-                            Colors.yellow,
-                            Colors.red,
-                          ],
-                          textAlign: TextAlign.center,
-                        // or Alignment.topLeft
+                      height: 25.0,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ColorizeAnimatedTextKit(
+                        onTap: () {
+                          print("Tap Event");
+                        },
+                        text: [
+                          "Requesting a Ride...",
+                          "Please wait...",
+                          "Finding a Driver...",
+                        ],
+                        textStyle: TextStyle(
+                          fontSize: 30.0,
+                          //fontFamily: "Signatra"
                         ),
+                        colors: [
+                          Colors.green,
+                          Colors.purple,
+                          Colors.pink,
+                          Colors.blue,
+                          Colors.yellow,
+                          Colors.red,
+                        ],
+                        textAlign: TextAlign.center,
+                        // or Alignment.topLeft
                       ),
-
-                    SizedBox(height: 22.0,),
-
+                    ),
+                    SizedBox(
+                      height: 30.0,
+                    ),
                     GestureDetector(
-                      onTap: ()
-                      {
+                      onTap: () {
                         cancelRideRequest();
                         resetApp();
                       },
                       child: Container(
-                        height: 60.0,
-                        width: 60.0,
+                        height: 50.0,
+                        width: 50.0,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(26.0),
-                          border: Border.all(width: 2.0, color: Colors.grey[300]),
+                          border: Border.all(width: 2.0, color: Colors.green),
                         ),
-                        child: Icon(Icons.close, size: 26.0,),
+                        child: Icon(
+                          Icons.close,
+                          size: 22.0,
+                          color: Colors.green,
+                        ),
                       ),
                     ),
-
-                    SizedBox(height: 10.0,),
-
+                    SizedBox(
+                      height: 20.0,
+                    ),
                     Container(
                       width: double.infinity,
-                      child: Text("Cancel Ride", textAlign: TextAlign.center, style: TextStyle(fontSize: 12.0),),
+                      child: Text(
+                        "Cancel Ride",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16.0, color: Colors.green),
+                      ),
                     ),
                   ],
                 ),
@@ -926,7 +1123,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             right: 0.0,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0),),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
@@ -939,66 +1139,161 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
               ),
               height: driverDetailsContainerHeight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 18.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 6.0,),
-                    
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(rideStatus, textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0,
-                          //fontFamily: "Brand Bold",
-                        ),),
-                      ],
-                    ),
-
-                    SizedBox(height: 22.0,),
-
-                    Divider(height: 2.0, thickness: 2.0,),
-
-                    SizedBox(height: 22.0,),
-
-                    Text(carDetailsDriver, style: TextStyle(color: Colors.grey),),
-
-                    Text(driverName, style: TextStyle(fontSize: 20.0),),
-
-                    SizedBox(height: 22.0,),
-
-                    Divider(height: 2.0, thickness: 2.0,),
-
-                    SizedBox(height: 22.0,),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        //call button
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          child: RaisedButton(
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(24.0),
-                            ),
-                            onPressed: () async
-                            {
-                              launch(('tel://${driverphone}'));
-                            },
-                            color: Colors.black87,
-                            child: Padding(
-                              padding: EdgeInsets.all(17.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text("Call Driver   ", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),),
-                                  Icon(Icons.call, color: Colors.white, size: 26.0,),
-                                ],
-                              ),
-                            ),
-                          ),
+                        Text(
+                          rideStatus,
+                          style: TextStyle(fontSize: 18.0, color: Colors.black),
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 25.0,
+                    ),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Image.asset(
+                              "assets/images/user_icon.png",
+                              height: 65.0,
+                              width: 65.0,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              driverName,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  carRideType,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 22),
+                                ),
+                                Text(
+                                  "(" + carDetailsDriver + ")",
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Row(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            //call button
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.0),
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.red),
+                                    shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ))),
+                                onPressed: () async {
+                                  cancelRideRequest();
+                                  resetApp();
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        "Cancel   ",
+                                        style: TextStyle(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                      Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 20.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            //call button
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.0),
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.green),
+                                    shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ))),
+                                onPressed: () async {
+                                  launch(('tel://${driverphone}'));
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.all(3.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        "Call Driver   ",
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      Icon(
+                                        Icons.call,
+                                        color: Colors.black,
+                                        size: 20.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -1009,9 +1304,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     );
   }
 
-  Future<void> getPlaceDirection() async
-  {
-    var initialPos = Provider.of<AppData>(context, listen: false).pickUpLocation;
+  Future<void> getPlaceDirection() async {
+    var initialPos =
+        Provider.of<AppData>(context, listen: false).pickUpLocation;
     var finalPos = Provider.of<AppData>(context, listen: false).dropOffLocation;
 
     var pickUpLatLng = LatLng(initialPos.latitude, initialPos.longitude);
@@ -1019,10 +1314,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
 
     showDialog(
         context: context,
-        builder: (BuildContext context) => ProgressDialog(message: "Please wait...",)
-    );
+        builder: (BuildContext context) => ProgressDialog(
+              message: "Please wait...",
+            ));
 
-    var details = await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
+    var details = await AssistantMethods.obtainPlaceDirectionDetails(
+        pickUpLatLng, dropOffLatLng);
     setState(() {
       tripDirectionDetails = details;
     });
@@ -1033,14 +1330,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     print(details.encodedPoints);
 
     PolylinePoints polylinePoints = PolylinePoints();
-    List<PointLatLng> decodedPolyLinePointsResult = polylinePoints.decodePolyline(details.encodedPoints);
+    List<PointLatLng> decodedPolyLinePointsResult =
+        polylinePoints.decodePolyline(details.encodedPoints);
 
     pLineCoordinates.clear();
 
-    if(decodedPolyLinePointsResult.isNotEmpty)
-    {
+    if (decodedPolyLinePointsResult.isNotEmpty) {
       decodedPolyLinePointsResult.forEach((PointLatLng pointLatLng) {
-        pLineCoordinates.add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+        pLineCoordinates
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
       });
     }
 
@@ -1062,35 +1360,38 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     });
 
     LatLngBounds latLngBounds;
-    if(pickUpLatLng.latitude > dropOffLatLng.latitude  &&  pickUpLatLng.longitude > dropOffLatLng.longitude)
-    {
-      latLngBounds = LatLngBounds(southwest: dropOffLatLng, northeast: pickUpLatLng);
-    }
-    else if(pickUpLatLng.longitude > dropOffLatLng.longitude)
-    {
-      latLngBounds = LatLngBounds(southwest: LatLng(pickUpLatLng.latitude, dropOffLatLng.longitude), northeast: LatLng(dropOffLatLng.latitude, pickUpLatLng.longitude));
-    }
-    else if(pickUpLatLng.latitude > dropOffLatLng.latitude)
-    {
-      latLngBounds = LatLngBounds(southwest: LatLng(dropOffLatLng.latitude, pickUpLatLng.longitude), northeast: LatLng(pickUpLatLng.latitude, dropOffLatLng.longitude));
-    }
-    else
-    {
-      latLngBounds = LatLngBounds(southwest: pickUpLatLng, northeast: dropOffLatLng);
+    if (pickUpLatLng.latitude > dropOffLatLng.latitude &&
+        pickUpLatLng.longitude > dropOffLatLng.longitude) {
+      latLngBounds =
+          LatLngBounds(southwest: dropOffLatLng, northeast: pickUpLatLng);
+    } else if (pickUpLatLng.longitude > dropOffLatLng.longitude) {
+      latLngBounds = LatLngBounds(
+          southwest: LatLng(pickUpLatLng.latitude, dropOffLatLng.longitude),
+          northeast: LatLng(dropOffLatLng.latitude, pickUpLatLng.longitude));
+    } else if (pickUpLatLng.latitude > dropOffLatLng.latitude) {
+      latLngBounds = LatLngBounds(
+          southwest: LatLng(dropOffLatLng.latitude, pickUpLatLng.longitude),
+          northeast: LatLng(pickUpLatLng.latitude, dropOffLatLng.longitude));
+    } else {
+      latLngBounds =
+          LatLngBounds(southwest: pickUpLatLng, northeast: dropOffLatLng);
     }
 
-    newGoogleMapController.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 70));
+    newGoogleMapController
+        .animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 70));
 
     Marker pickUpLocMarker = Marker(
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-      infoWindow: InfoWindow(title: initialPos.userplaceName, snippet: "my Location"),
+      infoWindow:
+          InfoWindow(title: initialPos.userplaceName, snippet: "my Location"),
       position: pickUpLatLng,
       markerId: MarkerId("pickUpId"),
     );
 
     Marker dropOffLocMarker = Marker(
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      infoWindow: InfoWindow(title: finalPos.userplaceName, snippet: "DropOff Location"),
+      infoWindow: InfoWindow(
+          title: finalPos.userplaceName, snippet: "DropOff Location"),
       position: dropOffLatLng,
       markerId: MarkerId("dropOffId"),
     );
@@ -1124,24 +1425,26 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     });
   }
 
-  void initGeoFireListner()
-  {
+  void initGeoFireListner() {
     Geofire.initialize('availableDrivers');
     //comment
-    Geofire.queryAtLocation(currentPosition.latitude, currentPosition.longitude, 2).listen((map) {
+    Geofire.queryAtLocation(
+            currentPosition.latitude, currentPosition.longitude, 2)
+        .listen((map) {
       print(map);
       if (map != null) {
         var callBack = map['callBack'];
 
         switch (callBack) {
           case Geofire.onKeyEntered:
-            NearbyAvailableDrivers nearbyAvailableDrivers = NearbyAvailableDrivers();
+            NearbyAvailableDrivers nearbyAvailableDrivers =
+                NearbyAvailableDrivers();
             nearbyAvailableDrivers.key = map['key'];
             nearbyAvailableDrivers.latitude = map['latitude'];
             nearbyAvailableDrivers.longitude = map['longitude'];
-            GeoFireAssistant.nearByAvailableDriversList.add(nearbyAvailableDrivers);
-            if(nearbyAvailableDriverKeysLoaded == true)
-            {
+            GeoFireAssistant.nearByAvailableDriversList
+                .add(nearbyAvailableDrivers);
+            if (nearbyAvailableDriverKeysLoaded == true) {
               updateAvailableDriversOnMap();
             }
             break;
@@ -1152,7 +1455,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
             break;
 
           case Geofire.onKeyMoved:
-            NearbyAvailableDrivers nearbyAvailableDrivers = NearbyAvailableDrivers();
+            NearbyAvailableDrivers nearbyAvailableDrivers =
+                NearbyAvailableDrivers();
             nearbyAvailableDrivers.key = map['key'];
             nearbyAvailableDrivers.latitude = map['latitude'];
             nearbyAvailableDrivers.longitude = map['longitude'];
@@ -1171,16 +1475,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     //comment
   }
 
-  void updateAvailableDriversOnMap()
-  {
+  void updateAvailableDriversOnMap() {
     setState(() {
       markersSet.clear();
     });
 
     Set<Marker> tMakers = Set<Marker>();
-    for(NearbyAvailableDrivers driver in GeoFireAssistant.nearByAvailableDriversList)
-    {
-      LatLng driverAvailablePosition = LatLng(driver.latitude, driver.longitude);
+    for (NearbyAvailableDrivers driver
+        in GeoFireAssistant.nearByAvailableDriversList) {
+      LatLng driverAvailablePosition =
+          LatLng(driver.latitude, driver.longitude);
 
       Marker marker = Marker(
         markerId: MarkerId('driver${driver.key}'),
@@ -1196,32 +1500,27 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     });
   }
 
-  void createIconMarker()
-  {
-    if(nearByIcon == null)
-    {
-      ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, 'assets/images/car_android.png')
-          .then((value)
-      {
+  void createIconMarker() {
+    if (nearByIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, 'assets/images/car_android.png')
+          .then((value) {
         nearByIcon = value;
       });
     }
   }
 
-  void noDriverFound()
-  {
+  void noDriverFound() {
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => NoDriverAvailableDialog()
-    );
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => NoDriverAvailableDialog());
   }
 
-  void searchNearestDriver()
-  {
-    if(availableDrivers.length == 0) 
-    {
+  void searchNearestDriver() {
+    if (availableDrivers.length == 0) {
       cancelRideRequest();
       resetApp();
       noDriverFound();
@@ -1229,49 +1528,47 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
     }
 
     var driver = availableDrivers[0];
-    
-    driversRef.child(driver.key).child("car_details").child("type").once().then((DataSnapshot snap) async
-    {
-      if(await snap.value != null)
-      {
+
+    driversRef
+        .child(driver.key)
+        .child("car_details")
+        .child("type")
+        .once()
+        .then((DataSnapshot snap) async {
+      if (await snap.value != null) {
         String carType = snap.value.toString();
-        if(carType == carRideType)
-        {
+        if (carType == carRideType) {
           notifyDriver(driver);
           availableDrivers.removeAt(0);
+        } else {
+          displayToastMessage(
+              carRideType + " drivers not available. Try again.", context);
         }
-        else
-        {
-          displayToastMessage(carRideType + " drivers not available. Try again.", context);
-        }
-      }
-      else
-      {
+      } else {
         displayToastMessage("No car found. Try again.", context);
       }
-    }
-    );
+    });
   }
 
-  void notifyDriver(NearbyAvailableDrivers driver)
-  {
+  void notifyDriver(NearbyAvailableDrivers driver) {
     driversRef.child(driver.key).child("newRide").set(rideRequestRef.key);
 
-    driversRef.child(driver.key).child("token").once().then((DataSnapshot snap){
-      if(snap.value != null)
-      {
+    driversRef
+        .child(driver.key)
+        .child("token")
+        .once()
+        .then((DataSnapshot snap) {
+      if (snap.value != null) {
         String token = snap.value.toString();
-        AssistantMethods.sendNotificationToDriver(token, context, rideRequestRef.key);
-      }
-      else
-      {
+        AssistantMethods.sendNotificationToDriver(
+            token, context, rideRequestRef.key);
+      } else {
         return;
       }
 
       const oneSecondPassed = Duration(seconds: 1);
       var timer = Timer.periodic(oneSecondPassed, (timer) {
-        if(state != "requesting")
-        {
+        if (state != "requesting") {
           driversRef.child(driver.key).child("newRide").set("cancelled");
           driversRef.child(driver.key).child("newRide").onDisconnect();
           driverRequestTimeOut = 40;
@@ -1281,16 +1578,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin
         driverRequestTimeOut = driverRequestTimeOut - 1;
 
         driversRef.child(driver.key).child("newRide").onValue.listen((event) {
-          if(event.snapshot.value.toString() == "accepted")
-          {
+          if (event.snapshot.value.toString() == "accepted") {
             driversRef.child(driver.key).child("newRide").onDisconnect();
             driverRequestTimeOut = 40;
             timer.cancel();
           }
         });
 
-        if(driverRequestTimeOut == 0)
-        {
+        if (driverRequestTimeOut == 0) {
           driversRef.child(driver.key).child("newRide").set("timeout");
           driversRef.child(driver.key).child("newRide").onDisconnect();
           driverRequestTimeOut = 40;

@@ -1,100 +1,70 @@
 {
   "project_info": {
-    "project_number": "177263042452",
-    "firebase_url": "https://godrive-79ea0-default-rtdb.firebaseio.com",
-    "project_id": "godrive-79ea0",
-    "storage_bucket": "godrive-79ea0.appspot.com"
+    "project_number": "1081234483782",
+    "project_id": "goedrive-b1dd1",
+    "storage_bucket": "goedrive-b1dd1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:177263042452:android:1368bee00e76556097f981",
+        "mobilesdk_app_id": "1:1081234483782:android:22c9c3031cb365273fb847",
         "android_client_info": {
           "package_name": "com.android.application"
         }
       },
       "oauth_client": [
         {
-          "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAUONLjZwiZ_Q8ECASVjgbbPE1PlqFoAHA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:177263042452:android:fefb58b1a8aeb60897f981",
-        "android_client_info": {
-          "package_name": "com.boomer.driver"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAUONLjZwiZ_Q8ECASVjgbbPE1PlqFoAHA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:177263042452:android:802a7b84014a497c97f981",
-        "android_client_info": {
-          "package_name": "com.boomer.rider"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "177263042452-q01dkd4bhdkub409ls5v1uk5c4nqan8u.apps.googleusercontent.com",
+          "client_id": "1081234483782-l253r2632kloq3o21hthvgj014kh0sqd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.boomer.rider",
+            "package_name": "com.android.application",
             "certificate_hash": "a83b8512d81cff503d4a0ba16245bfc3dda8a951"
           }
         },
         {
-          "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
+          "client_id": "1081234483782-o4abqo4mmosnhuvsnugudds7ltghi92o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAUONLjZwiZ_Q8ECASVjgbbPE1PlqFoAHA"
+          "current_key": "AIzaSyB2R--upeeXhruUfAXFyXAMkSmQ06kcWL0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "177263042452-nl9707n2cj9leilo6s39icqr12jpck0i.apps.googleusercontent.com",
+              "client_id": "1081234483782-o4abqo4mmosnhuvsnugudds7ltghi92o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081234483782:android:13c799ce0d3715653fb847",
+        "android_client_info": {
+          "package_name": "com.example.godrivedriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081234483782-o4abqo4mmosnhuvsnugudds7ltghi92o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2R--upeeXhruUfAXFyXAMkSmQ06kcWL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081234483782-o4abqo4mmosnhuvsnugudds7ltghi92o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
