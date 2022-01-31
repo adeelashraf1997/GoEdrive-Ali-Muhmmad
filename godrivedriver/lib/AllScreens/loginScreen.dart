@@ -55,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Email",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -67,12 +68,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(fontSize: 14.0),
                     ),
                     SizedBox(
-                      height: 1.0,
+                      height: 5.0,
                     ),
                     TextField(
                       controller: passwordTextEditingController,
                       obscureText: true,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Password",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -87,21 +89,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 20.0,
                     ),
-                    RaisedButton(
-                      color: Colors.yellow,
-                      textColor: Colors.white,
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green),
+                      ),
                       child: Container(
                         height: 50.0,
                         child: Center(
                           child: Text(
                             "Login",
                             style: TextStyle(
-                                fontSize: 18.0, fontFamily: "Brand Bold"),
+                                color: Colors.white,
+                                fontSize: 18.0,
+                                fontFamily: "Brand Bold"),
                           ),
                         ),
-                      ),
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(24.0),
                       ),
                       onPressed: () {
                         if (!emailTextEditingController.text.contains("@")) {

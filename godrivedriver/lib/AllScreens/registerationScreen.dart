@@ -47,12 +47,13 @@ class RegisterationScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 1.0,
+                      height: 5.0,
                     ),
                     TextField(
                       controller: nameTextEditingController,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Name",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -65,12 +66,13 @@ class RegisterationScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 14.0),
                     ),
                     SizedBox(
-                      height: 1.0,
+                      height: 5.0,
                     ),
                     TextField(
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Email",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -83,12 +85,13 @@ class RegisterationScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 14.0),
                     ),
                     SizedBox(
-                      height: 1.0,
+                      height: 5.0,
                     ),
                     TextField(
                       controller: phoneTextEditingController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Phone",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -101,12 +104,13 @@ class RegisterationScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 14.0),
                     ),
                     SizedBox(
-                      height: 1.0,
+                      height: 5.0,
                     ),
                     TextField(
                       controller: passwordTextEditingController,
                       obscureText: true,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Password",
                         labelStyle: TextStyle(
                           fontSize: 14.0,
@@ -121,21 +125,28 @@ class RegisterationScreen extends StatelessWidget {
                     SizedBox(
                       height: 20.0,
                     ),
-                    RaisedButton(
-                      color: Colors.yellow,
-                      textColor: Colors.white,
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green),
+                      ),
                       child: Container(
                         height: 50.0,
                         child: Center(
                           child: Text(
                             "Create Account",
                             style: TextStyle(
-                                fontSize: 18.0, fontFamily: "Brand Bold"),
+                                fontSize: 18.0,
+                                fontFamily: "Brand Bold",
+                                color: Colors.white),
                           ),
                         ),
-                      ),
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(24.0),
                       ),
                       onPressed: () {
                         if (nameTextEditingController.text.length < 3) {

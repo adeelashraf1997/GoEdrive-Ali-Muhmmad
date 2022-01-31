@@ -56,6 +56,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     TextField(
                       controller: carModelTextEditingController,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Car Model",
                         hintStyle:
                             TextStyle(color: Colors.grey, fontSize: 10.0),
@@ -68,6 +69,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     TextField(
                       controller: carNumberTextEditingController,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Car Number",
                         hintStyle:
                             TextStyle(color: Colors.grey, fontSize: 10.0),
@@ -80,6 +82,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     TextField(
                       controller: carColorTextEditingController,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: "Car Color",
                         hintStyle:
                             TextStyle(color: Colors.grey, fontSize: 10.0),
@@ -87,31 +90,46 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                       style: TextStyle(fontSize: 15.0),
                     ),
                     SizedBox(
-                      height: 26.0,
+                      height: 10.0,
                     ),
-                    DropdownButton(
-                      iconSize: 40,
-                      hint: Text('Please choose Car Type'),
-                      value: selectedCarType,
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedCarType = newValue;
-                          displayToastMessage(selectedCarType, context);
-                        });
-                      },
-                      items: carTypesList.map((car) {
-                        return DropdownMenuItem(
-                          child: new Text(car),
-                          value: car,
-                        );
-                      }).toList(),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 3),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: DropdownButton(
+                          iconSize: 40,
+                          hint: Text(
+                            'Please choose Car Type',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          value: selectedCarType,
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedCarType = newValue;
+                              displayToastMessage(selectedCarType, context);
+                            });
+                          },
+                          items: carTypesList.map((car) {
+                            return DropdownMenuItem(
+                              child: Text(car),
+                              value: car,
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
                     SizedBox(
                       height: 42.0,
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.green),
+                        ),
                         onPressed: () {
                           if (carModelTextEditingController.text.isEmpty) {
                             displayToastMessage(
@@ -131,7 +149,6 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                             saveDriverCarInfo(context);
                           }
                         },
-                        color: Colors.black54,
                         child: Padding(
                           padding: EdgeInsets.all(17.0),
                           child: Row(
